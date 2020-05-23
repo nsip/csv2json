@@ -1,6 +1,7 @@
 package webapi
 
 import (
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -91,6 +92,26 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
-		return c.JSON()
+		bytes, err := ioutil.ReadAll(c.Request().Body)
+		csvstr := string(bytes)
+		log("\n%s\n", csvstr)
+
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, result{
+				Data:  nil,
+				Info:  "",
+				Error: err.Error(),
+			})
+		}
+
+		return c.String(http.StatusOK, "Coming soon")
+	})
+
+	path = route.JSON2CSV
+	e.POST(path, func(c echo.Context) error {
+		defer func() { mMtx[path].Unlock() }()
+		mMtx[path].Lock()
+
+		return c.String(http.StatusInternalServerError, "Not implemented")
 	})
 }
