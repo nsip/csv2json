@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	cmn "github.com/cdutwhu/json-util/common"
+	cmn "github.com/cdutwhu/n3-util/common"
 	glb "github.com/nsip/n3-csv2json/Server/global"
 )
 
@@ -16,6 +16,7 @@ var (
 	fPln        = fmt.Println
 	fSf         = fmt.Sprintf
 	sReplaceAll = strings.ReplaceAll
+	sJoin       = strings.Join
 
 	localIP       = cmn.LocalIP
 	isXML         = cmn.IsXML
