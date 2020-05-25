@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	g "github.com/nsip/n3-csv2json/Server/global"
 	api "github.com/nsip/n3-csv2json/Server/webapi"
@@ -14,6 +16,8 @@ func main() {
 
 	setLog(logfile)
 	fPln(logWhen(true, "[%s] Hosting on: [%v:%d], version [%v]", servicename, localIP(), ws.Port, ws.Version))
+
+	os.Setenv("JAEGER_SERVICE_NAME", servicename)
 
 	done := make(chan string)
 	go api.HostHTTPAsync()
