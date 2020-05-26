@@ -15,6 +15,7 @@ import (
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
 func HostHTTPAsync() {
 	e := echo.New()
+	defer e.Close()
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -38,7 +39,7 @@ func HostHTTPAsync() {
 	route := cfg.Route
 	file := cfg.File
 
-	initMutex()
+	mMtx := initMutex()
 
 	defer e.Start(fSf(":%d", port))
 
