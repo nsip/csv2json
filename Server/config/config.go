@@ -35,8 +35,8 @@ type Config struct {
 	}
 }
 
-// NewCfg :
-func NewCfg(configs ...string) *Config {
+// newCfg :
+func newCfg(configs ...string) *Config {
 	for _, f := range configs {
 		if _, e := os.Stat(f); e == nil {
 			return (&Config{Path: f}).set()
@@ -73,4 +73,15 @@ func (cfg *Config) save() {
 		defer f.Close()
 		toml.NewEncoder(f).Encode(cfg)
 	}
+}
+
+// InitEnvVarFromTOML : initialize the global variables
+func InitEnvVarFromTOML(key string, configs ...string) bool {
+	configs = append(configs, "./config.toml", "../config.toml", "../../config.toml", "./config/config.toml")
+	Cfg := newCfg(configs...)
+	if Cfg == nil {
+		return false
+	}
+	struct2Env(key, Cfg)
+	return true
 }

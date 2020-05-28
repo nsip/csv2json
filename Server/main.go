@@ -4,15 +4,15 @@ import (
 	"os"
 
 	eg "github.com/cdutwhu/n3-util/n3errs"
-	g "github.com/nsip/n3-csv2json/Server/global"
+	cfg "github.com/nsip/n3-csv2json/Server/config"
 	api "github.com/nsip/n3-csv2json/Server/webapi"
 )
 
 func main() {
-	failOnErrWhen(!g.Init(), "%v: Global Config Init Error", eg.CFG_INIT_ERR)
+	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", eg.CFG_INIT_ERR)
 
-	cfg := g.Cfg
-	ws, logfile, servicename := cfg.WebService, cfg.LogFile, cfg.ServiceName
+	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	ws, logfile, servicename := Cfg.WebService, Cfg.LogFile, Cfg.ServiceName
 
 	setLog(logfile)
 	fPln(logWhen(true, "[%s] Hosting on: [%v:%d], version [%v]", servicename, localIP(), ws.Port, ws.Version))

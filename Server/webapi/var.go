@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	cmn "github.com/cdutwhu/n3-util/common"
-	glb "github.com/nsip/n3-csv2json/Server/global"
 )
 
 var (
@@ -25,11 +24,12 @@ var (
 	failOnErr     = cmn.FailOnErr
 	mustWriteFile = cmn.MustWriteFile
 	mapFromStruct = cmn.MapFromStruct
+	env2Struct    = cmn.Env2Struct
 )
 
-func initMutex() map[string]*sync.Mutex {
+func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	for _, v := range mapFromStruct(glb.Cfg.Route) {
+	for _, v := range mapFromStruct(route) {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx

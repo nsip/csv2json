@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/middleware"
-	glb "github.com/nsip/n3-csv2json/Server/global"
+	cfg "github.com/nsip/n3-csv2json/Server/config"
 )
 
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
@@ -33,13 +33,12 @@ func HostHTTPAsync() {
 		AllowCredentials: true,
 	}))
 
-	cfg := glb.Cfg
-	port := cfg.WebService.Port
+	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	port := Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
-	route := cfg.Route
-	file := cfg.File
-
-	mMtx := initMutex()
+	route := Cfg.Route
+	file := Cfg.File
+	mMtx := initMutex(route)
 
 	defer e.Start(fSf(":%d", port))
 
