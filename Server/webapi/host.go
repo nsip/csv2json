@@ -3,12 +3,14 @@ package webapi
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/cdutwhu/n3-util/n3csv"
 	eg "github.com/cdutwhu/n3-util/n3errs"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/middleware"
+	"github.com/nats-io/nats.go"
 	cfg "github.com/nsip/n3-csv2json/Server/config"
 )
 
@@ -92,28 +94,56 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
-		// bytes, err := ioutil.ReadAll(c.Request().Body)
-		// csvstr := string(bytes)
-		// log("\n%s\n", csvstr)
-
-		// if err != nil {
-		// 	return c.JSON(http.StatusBadRequest, result{
-		// 		Data:  nil,
-		// 		Info:  "",
-		// 		Error: err.Error(),
-		// 	})
-		// }
+		var errSvr error
+		pub2nats := false
+		if ok, n := url1Value(c.QueryParams(), 0, "nats"); ok && n != "" {
+			pub2nats = true
+		}
 
 		// jsonstr, headers := n3csv.Reader2JSON(c.Request().Body, "")
 
 		// Trace [n3csv.Reader2JSON]
 		results := jaegertracing.TraceFunction(c, n3csv.Reader2JSON, c.Request().Body, "")
 		jsonstr := results[0].Interface().(string)
-		headers := results[1].Interface().([]string)
+		// headers := results[1].Interface().([]string)
+
+		info := "[n3csv.Reader2JSON]"
+
+		// send a copy to NATS
+		if pub2nats {
+			url := Cfg.NATS.URL
+			subj := Cfg.NATS.Subject
+			timeout := time.Duration(Cfg.NATS.Timeout)
+
+			info += fSf(" | To NATS@Subject: [%s@%s]", url, subj)
+			nc, err := nats.Connect(url)
+			if err != nil {
+				errSvr = err
+				goto ERR
+			}
+
+			msg, err := nc.Request(subj, []byte(jsonstr), timeout*time.Millisecond)
+			if msg != nil {
+				info += fSf(" | NATS responded: [%s]", string(msg.Data))
+			}
+			if err != nil {
+				errSvr = err
+				goto ERR
+			}
+		}
+
+	ERR:
+		if errSvr != nil {
+			return c.JSON(http.StatusInternalServerError, result{
+				Data:  nil,
+				Info:  info,
+				Error: errSvr.Error(),
+			})
+		}
 
 		return c.JSON(http.StatusOK, result{
 			Data:  &jsonstr,
-			Info:  sJoin(headers, ","),
+			Info:  info,
 			Error: "",
 		})
 	})

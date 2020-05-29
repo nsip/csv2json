@@ -1,0 +1,16 @@
+Path = "/home/qmiao/go/src/github.com/nsip/n3-csv2json/Server/go-client/config.toml"
+LogFile = "./go-clt-CSV2JSON-[DATE].log"
+ServiceName = "N3-CSV2JSON"
+
+[Server]
+  Protocol = "http"
+  IP = "192.168.31.168"
+  Port = 1325
+
+[Access]
+  Timeout = 3
+
+[Route]
+  HELP = "/"
+  CSV2JSON = "/csv2json/0.1.0"
+  JSON2CSV = "/json2csv/0.1.0"

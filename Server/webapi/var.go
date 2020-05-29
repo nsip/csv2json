@@ -24,6 +24,7 @@ var (
 	failOnErr     = cmn.FailOnErr
 	mustWriteFile = cmn.MustWriteFile
 	mapFromStruct = cmn.MapFromStruct
+	url1Value     = cmn.URL1Value
 	env2Struct    = cmn.Env2Struct
 )
 
