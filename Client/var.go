@@ -29,4 +29,5 @@ var (
 	isJSON        = cmn.IsJSON
 	env2Struct    = cmn.Env2Struct
 	struct2Env    = cmn.Struct2Env
+	structFields  = cmn.StructFields
 )

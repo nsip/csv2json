@@ -13,7 +13,7 @@ import (
 func DO(configfile, fn string, args Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML("Cfg-Clt-C2J", configfile), "%v", eg.CFG_INIT_ERR)
 
-	Cfg := env2Struct("Cfg-Clt-C2J", &config{}).(*config)
+	Cfg := env2Struct("Cfg-Clt-C2J", &Config{}).(*Config)
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout
@@ -21,7 +21,7 @@ func DO(configfile, fn string, args Args) (string, error) {
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, Cfg.Route)
 	url, ok := mFnURL[fn]
-	if err := warnOnErrWhen(!ok, "%v: Need ["+sJoin(fields, " ")+"]", eg.PARAM_NOT_SUPPORTED); err != nil {
+	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err
 	}
 
@@ -56,9 +56,9 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 	logWhen(args.WholeDump, "accessing ... %s", url)
 
 	var (
-		Resp *http.Response
-		Err  error
-		Data []byte
+		Resp    *http.Response
+		Err     error
+		RetData []byte
 	)
 
 	switch fn {
@@ -68,14 +68,11 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 		}
 
 	case "CSV2JSON", "JSON2CSV":
-		if Data, Err = ioutil.ReadFile(args.File); Err != nil {
-			goto ERR_RET
-		}
-		if fn == "JSON2CSV" && !isJSON(string(Data)) {
+		if fn == "JSON2CSV" && !isJSON(string(args.Data)) {
 			Err = eg.PARAM_INVALID_JSON
 			goto ERR_RET
 		}
-		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(Data)); Err != nil {
+		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(args.Data)); Err != nil {
 			goto ERR_RET
 		}
 	}
@@ -86,7 +83,7 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 	}
 	defer Resp.Body.Close()
 
-	if Data, Err = ioutil.ReadAll(Resp.Body); Err != nil {
+	if RetData, Err = ioutil.ReadAll(Resp.Body); Err != nil {
 		goto ERR_RET
 	}
 
@@ -97,7 +94,7 @@ ERR_RET:
 		return
 	}
 
-	chStr <- string(Data)
+	chStr <- string(RetData)
 	chErr <- eg.NO_ERROR
 	return
 }

@@ -23,14 +23,14 @@ var (
 	warnOnErr     = cmn.WarnOnErr
 	failOnErr     = cmn.FailOnErr
 	mustWriteFile = cmn.MustWriteFile
-	mapFromStruct = cmn.MapFromStruct
+	struct2Map    = cmn.Struct2Map
 	url1Value     = cmn.URL1Value
 	env2Struct    = cmn.Env2Struct
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	for _, v := range mapFromStruct(route) {
+	for _, v := range struct2Map(route) {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx

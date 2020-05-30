@@ -17,7 +17,7 @@ var (
 	sReplace   = strings.Replace
 	sTrimRight = strings.TrimRight
 
-	mapFromStruct = cmn.MapFromStruct
+	struct2Map    = cmn.Struct2Map
 	mapKeys       = cmn.MapKeys
 	failOnErrWhen = cmn.FailOnErrWhen
 	failOnErr     = cmn.FailOnErr
@@ -34,14 +34,14 @@ var (
 
 // Args is arguments for "Route"
 type Args struct {
-	File      string
+	Data      []byte
 	WholeDump bool
 	ToNATS    bool
 }
 
 func initMapFnURL(protocol, ip string, port int, route interface{}) (map[string]string, []string) {
 	mFnURL := make(map[string]string)
-	for k, v := range mapFromStruct(route) {
+	for k, v := range struct2Map(route) {
 		mFnURL[k] = fSf("%s://%s:%d%s", protocol, ip, port, v)
 	}
 	return mFnURL, mapKeys(mFnURL).([]string)

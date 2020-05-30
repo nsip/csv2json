@@ -17,7 +17,7 @@ ServiceName = "N3-CSV2JSON"
   Timeout = 500
 
 [File]
-  ClientLinux64 = "../../../Client/build/Linux64/client"
-  ClientMac = "../../../Client/build/Mac/client"
-  ClientWin64 = "../../../Client/build/Win64/client.exe"
-  ClientConfig = "../../../Client/build/Linux64/config.toml"
+  ClientLinux64 = "../../../Client/build/linux64/client"
+  ClientMac = "../../../Client/build/mac/client"
+  ClientWin64 = "../../../Client/build/win64/client.exe"
+  ClientConfig = "../../../Client/build/linux64/config.toml"
