@@ -140,10 +140,14 @@ func HostHTTPAsync() {
 		}
 
 	RET:
+		RetErrStr := ""
+		if RetErr != nil {
+			RetErrStr = RetErr.Error()
+		}
 		return c.JSON(RetStat, result{
 			Data:  RetStr,
 			Info:  RetInfo,
-			Error: RetErr,
+			Error: RetErrStr,
 		})
 	})
 
@@ -152,10 +156,16 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
+		RetErr := eg.NOT_IMPLEMENTED
+
+		RetErrStr := ""
+		if RetErr != nil {
+			RetErrStr = RetErr.Error()
+		}
 		return c.JSON(http.StatusInternalServerError, result{
 			Data:  "",
 			Info:  "Not implemented",
-			Error: eg.NOT_IMPLEMENTED,
+			Error: RetErrStr,
 		})
 	})
 }
