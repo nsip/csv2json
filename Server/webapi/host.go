@@ -141,7 +141,7 @@ func HostHTTPAsync() {
 
 	RET:
 		return c.JSON(RetStat, result{
-			Data:  &RetStr,
+			Data:  RetStr,
 			Info:  RetInfo,
 			Error: RetErr,
 		})
@@ -153,7 +153,7 @@ func HostHTTPAsync() {
 		mMtx[path].Lock()
 
 		return c.JSON(http.StatusInternalServerError, result{
-			Data:  nil,
+			Data:  "",
 			Info:  "Not implemented",
 			Error: eg.NOT_IMPLEMENTED,
 		})
