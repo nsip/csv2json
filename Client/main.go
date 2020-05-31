@@ -29,9 +29,8 @@ func main() {
 		cltcfg,
 		fn,
 		clt.Args{
-			Data:      data,
-			WholeDump: *wPtr,
-			ToNATS:    *nPtr,
+			Data:   data,
+			ToNATS: *nPtr,
 		})
 	failOnErr("Access CSV2JSON Service Failed: %v", err)
 

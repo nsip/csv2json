@@ -94,57 +94,56 @@ func HostHTTPAsync() {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
-		var errSvr error
-		pub2nats := false
-		if ok, n := url1Value(c.QueryParams(), 0, "nats"); ok && n != "" {
-			pub2nats = true
+		var (
+			RetStat = http.StatusOK
+			RetStr  string
+			RetInfo = "[n3csv.Reader2JSON]"
+			RetErr  error
+		)
+
+		var (
+			ToNATS bool
+		)
+
+		if ok, n := url1Value(c.QueryParams(), 0, "nats"); ok && n == "true" {
+			ToNATS = true
 		}
 
 		// jsonstr, headers := n3csv.Reader2JSON(c.Request().Body, "")
 
 		// Trace [n3csv.Reader2JSON]
 		results := jaegertracing.TraceFunction(c, n3csv.Reader2JSON, c.Request().Body, "")
-		jsonstr := results[0].Interface().(string)
+		RetStr = results[0].Interface().(string)
 		// headers := results[1].Interface().([]string)
 
-		info := "[n3csv.Reader2JSON]"
-
 		// send a copy to NATS
-		if pub2nats {
+		if ToNATS {
 			url := Cfg.NATS.URL
 			subj := Cfg.NATS.Subject
 			timeout := time.Duration(Cfg.NATS.Timeout)
 
-			info += fSf(" | To NATS@Subject: [%s@%s]", url, subj)
+			RetInfo += fSf(" | To NATS@Subject: [%s@%s]", url, subj)
 			nc, err := nats.Connect(url)
 			if err != nil {
-				errSvr = err
-				goto ERR
+				RetStat, RetErr = http.StatusRequestTimeout, err
+				goto RET
 			}
 
-			msg, err := nc.Request(subj, []byte(jsonstr), timeout*time.Millisecond)
+			msg, err := nc.Request(subj, []byte(RetStr), timeout*time.Millisecond)
 			if msg != nil {
-				info += fSf(" | NATS responded: [%s]", string(msg.Data))
+				RetInfo += fSf(" | NATS responded: [%s]", string(msg.Data))
 			}
 			if err != nil {
-				errSvr = err
-				goto ERR
+				RetStat, RetErr = http.StatusInternalServerError, err
+				goto RET
 			}
 		}
 
-	ERR:
-		if errSvr != nil {
-			return c.JSON(http.StatusInternalServerError, result{
-				Data:  nil,
-				Info:  info,
-				Error: errSvr.Error(),
-			})
-		}
-
-		return c.JSON(http.StatusOK, result{
-			Data:  &jsonstr,
-			Info:  info,
-			Error: "",
+	RET:
+		return c.JSON(RetStat, result{
+			Data:  &RetStr,
+			Info:  RetInfo,
+			Error: RetErr,
 		})
 	})
 
@@ -156,7 +155,7 @@ func HostHTTPAsync() {
 		return c.JSON(http.StatusInternalServerError, result{
 			Data:  nil,
 			Info:  "Not implemented",
-			Error: "Not implemented",
+			Error: eg.NOT_IMPLEMENTED,
 		})
 	})
 }

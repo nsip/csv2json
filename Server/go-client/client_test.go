@@ -1,15 +1,19 @@
 package client
 
-import "testing"
+import (
+	"io/ioutil"
+	"testing"
+)
 
 func TestDO(t *testing.T) {
+	data, err := ioutil.ReadFile("../../_data/data.csv")
+	failOnErr("%v: ", err)
 	str, err := DO(
 		"./config.toml",
 		"CSV2JSON",
 		Args{
-			File:      "../../_data/data.csv",
-			WholeDump: true,
-			ToNATS:    false,
+			Data:   data,
+			ToNATS: false,
 		})
 	fPln(str)
 	fPln(err)

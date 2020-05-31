@@ -53,7 +53,7 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 	url = sReplace(url, "?&", "?", 1)
 	url = sTrimRight(url, "?&")
 
-	logWhen(args.WholeDump, "accessing ... %s", url)
+	logWhen(true, "accessing ... %s", url)
 
 	var (
 		Resp    *http.Response
@@ -68,11 +68,16 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 		}
 
 	case "CSV2JSON", "JSON2CSV":
-		if fn == "JSON2CSV" && !isJSON(string(args.Data)) {
+		data := args.Data
+		if data == nil {
+			Err = eg.HTTP_REQBODY_EMPTY
+			goto ERR_RET
+		}
+		if fn == "JSON2CSV" && !isJSON(string(data)) {
 			Err = eg.PARAM_INVALID_JSON
 			goto ERR_RET
 		}
-		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(args.Data)); Err != nil {
+		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(data)); Err != nil {
 			goto ERR_RET
 		}
 	}

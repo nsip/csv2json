@@ -39,5 +39,5 @@ func initMutex(route interface{}) map[string]*sync.Mutex {
 type result struct {
 	Data  *string `json:"data"`
 	Info  string  `json:"info"`
-	Error string  `json:"error"`
+	Error error   `json:"error"`
 }

@@ -1,24 +1,18 @@
 package client
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/davecgh/go-spew/spew"
+)
 
 func TestLoad(t *testing.T) {
 	cfg := newCfg("./config.toml")
-	fPln(cfg.Path)
-	fPln(cfg.LogFile)
-	fPln(cfg.Access)
-	fPln(cfg.Server)
-	fPln(cfg.Route)
-	fPln(cfg.ServiceName)
+	spew.Dump(cfg)
 }
 
 func TestInit(t *testing.T) {
 	initEnvVarFromTOML("Cfg-Clt-C2J", "./config.toml")
-	cfg := env2Struct("Cfg-Clt-C2J", &config{}).(*config)
-	fPln(cfg.Path)
-	fPln(cfg.LogFile)
-	fPln(cfg.Access)
-	fPln(cfg.Server)
-	fPln(cfg.Route)
-	fPln(cfg.ServiceName)
+	cfg := env2Struct("Cfg-Clt-C2J", &Config{}).(*Config)
+	spew.Dump(cfg)
 }
