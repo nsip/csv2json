@@ -35,7 +35,9 @@ func HostHTTPAsync() {
 		AllowCredentials: true,
 	}))
 
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	ICfg, err := env2Struct("Cfg", &cfg.Config{})
+	failOnErr("%v", err)
+	Cfg := ICfg.(*cfg.Config)
 	port := Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
 	route := Cfg.Route

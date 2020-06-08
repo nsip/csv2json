@@ -15,7 +15,9 @@ import (
 // DOwithTrace :
 func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
-	Cfg := env2Struct(envVarName, &Config{}).(*Config)
+	ICfg, err := env2Struct(envVarName, &Config{})
+	failOnErr("%v", err)
+	Cfg := ICfg.(*Config)
 	serviceName := Cfg.ServiceName
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
@@ -33,7 +35,10 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 // DO : fn ["HELP", "CSV2JSON", "JSON2CSV"]
 func DO(configfile, fn string, args Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
-	Cfg := env2Struct(envVarName, &Config{}).(*Config)
+	ICfg, err := env2Struct(envVarName, &Config{})
+	failOnErr("%v", err)
+	Cfg := ICfg.(*Config)
+
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout

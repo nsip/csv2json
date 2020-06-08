@@ -46,10 +46,14 @@ type Args struct {
 
 func initMapFnURL(protocol, ip string, port int, route interface{}) (map[string]string, []string) {
 	mFnURL := make(map[string]string)
-	for k, v := range struct2Map(route) {
+	m, err := struct2Map(route)
+	failOnErr("%v", err)
+	for k, v := range m {
 		mFnURL[k] = fSf("%s://%s:%d%s", protocol, ip, port, v)
 	}
-	return mFnURL, mapKeys(mFnURL).([]string)
+	IKeys, err := mapKeys(mFnURL)
+	failOnErr("%v", err)
+	return mFnURL, IKeys.([]string)
 }
 
 func initTracer(serviceName string) opentracing.Tracer {

@@ -13,6 +13,8 @@ func TestLoad(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	initEnvVarFromTOML("Cfg-Clt-C2J", "./config.toml")
-	cfg := env2Struct("Cfg-Clt-C2J", &Config{}).(*Config)
+	Icfg, err := env2Struct("Cfg-Clt-C2J", &Config{})
+	failOnErr("%v", err)
+	cfg := Icfg.(*Config)
 	spew.Dump(cfg)
 }
