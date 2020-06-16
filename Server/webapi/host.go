@@ -7,9 +7,9 @@ import (
 
 	"github.com/cdutwhu/n3-util/n3csv"
 	eg "github.com/cdutwhu/n3-util/n3errs"
-	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/jaegertracing"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/nats-io/nats.go"
 	cfg "github.com/nsip/n3-csv2json/Server/config"
 )
