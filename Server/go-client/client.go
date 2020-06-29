@@ -13,7 +13,7 @@ import (
 )
 
 // DOwithTrace :
-func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string, error) {
+func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
 	ICfg, err := env2Struct(envVarName, &Config{})
 	failOnErr("%v", err)
@@ -25,7 +25,7 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 		span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
 		tags.SpanKindRPCClient.Set(span)
 		tags.PeerService.Set(span, serviceName)
-		span.SetTag(fn, args)
+		span.SetTag(fn, *args)
 		defer span.Finish()
 		ctx = opentracing.ContextWithSpan(ctx, span)
 	}
@@ -33,7 +33,7 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args Args) (string,
 }
 
 // DO : fn ["HELP", "CSV2JSON", "JSON2CSV"]
-func DO(configfile, fn string, args Args) (string, error) {
+func DO(configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
 	ICfg, err := env2Struct(envVarName, &Config{})
 	failOnErr("%v", err)
@@ -68,10 +68,10 @@ func DO(configfile, fn string, args Args) (string, error) {
 }
 
 // rest :
-func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
+func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	paramN := ""
-	if args.ToNATS {
+	if args != nil && args.ToNATS {
 		paramN = fSf("nats=true")
 	}
 	url = fSf("%s?%s", url, paramN)
@@ -93,6 +93,11 @@ func rest(fn, url string, args Args, chStr chan string, chErr chan error) {
 		}
 
 	case "CSV2JSON", "JSON2CSV":
+		if args == nil {
+			Err = eg.PARAM_INVALID
+			goto ERR_RET
+		}
+
 		data := args.Data
 		if data == nil {
 			Err = eg.HTTP_REQBODY_EMPTY

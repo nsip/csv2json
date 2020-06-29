@@ -11,7 +11,7 @@ func TestDO(t *testing.T) {
 	str, err := DO(
 		"./config.toml",
 		"CSV2JSON",
-		Args{
+		&Args{
 			Data:   data,
 			ToNATS: false,
 		})
