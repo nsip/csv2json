@@ -21,11 +21,13 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 	defer cancel()
 	failOnErr("%v", e.Shutdown(ctx))
 	time.Sleep(20 * time.Millisecond)
-	done <- "HostHTTPAsync Exit"
+	done <- "Shutdown Successfully"
 }
 
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
+	defer func() { fPln(logger("HostHTTPAsync Exit")) }()
+
 	e := echo.New()
 	defer e.Close()
 
