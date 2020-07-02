@@ -9,9 +9,11 @@ import (
 )
 
 var (
-	fPf         = fmt.Printf
-	fPln        = fmt.Println
-	fSf         = fmt.Sprintf
+	fPf  = fmt.Printf
+	fPln = fmt.Println
+	fSf  = fmt.Sprintf
+	fEf  = fmt.Errorf
+
 	sReplaceAll = strings.ReplaceAll
 	sJoin       = strings.Join
 
@@ -22,6 +24,7 @@ var (
 	log           = cmn.Log
 	warnOnErr     = cmn.WarnOnErr
 	failOnErr     = cmn.FailOnErr
+	failOnErrWhen = cmn.FailOnErrWhen
 	mustWriteFile = cmn.MustWriteFile
 	struct2Map    = cmn.Struct2Map
 	url1Value     = cmn.URL1Value

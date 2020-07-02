@@ -1,6 +1,7 @@
 package webapi
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"time"
@@ -14,10 +15,22 @@ import (
 	cfg "github.com/nsip/n3-csv2json/Server/config"
 )
 
+func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
+	<-sig
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	failOnErr("%v", e.Shutdown(ctx))
+	time.Sleep(20 * time.Millisecond)
+	done <- "HostHTTPAsync Exit"
+}
+
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
-func HostHTTPAsync() {
+func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	e := echo.New()
 	defer e.Close()
+
+	// waiting for shutdown
+	go shutdownAsync(e, sig, done)
 
 	// Middleware
 	e.Use(middleware.Logger())
