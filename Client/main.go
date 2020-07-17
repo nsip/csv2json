@@ -12,8 +12,7 @@ import (
 
 func main() {
 	route := clt.Config{}.Route
-	fns, err := structFields(&route)
-	failOnErr("%v", err)
+	fns := structFields(&route)
 	failOnErrWhen(len(os.Args) < 3, "%v: need [config.toml] %v", eg.CLI_SUBCMD_ERR, fns)
 
 	cltcfg, fn := os.Args[1], os.Args[2]

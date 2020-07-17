@@ -15,9 +15,7 @@ import (
 // DOwithTrace :
 func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
-	ICfg, err := env2Struct(envVarName, &Config{})
-	failOnErr("%v", err)
-	Cfg := ICfg.(*Config)
+	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 	serviceName := Cfg.ServiceName
 
 	if span := opentracing.SpanFromContext(ctx); span != nil {
@@ -35,10 +33,8 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 // DO : fn ["HELP", "CSV2JSON", "JSON2CSV"]
 func DO(configfile, fn string, args *Args) (string, error) {
 	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
-	ICfg, err := env2Struct(envVarName, &Config{})
-	failOnErr("%v", err)
-	Cfg := ICfg.(*Config)
 
+	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
 	timeout := Cfg.Access.Timeout
@@ -46,7 +42,7 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, &Cfg.Route)
 	url, ok := mFnURL[fn]
-	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
+	if _, err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err
 	}
 
@@ -57,7 +53,8 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	select {
 	case <-time.After(time.Duration(timeout) * time.Second):
-		return "", warnOnErr("%v: Didn't get response in %d(s)", eg.NET_TIMEOUT, timeout)
+		_, err := warnOnErr("%v: Didn't get response in %d(s)", eg.NET_TIMEOUT, timeout)
+		return "", err
 	case str := <-chStr:
 		err := <-chErr
 		if err == eg.NO_ERROR {

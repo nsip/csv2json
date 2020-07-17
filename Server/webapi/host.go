@@ -50,9 +50,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		AllowCredentials: true,
 	}))
 
-	ICfg, err := env2Struct("Cfg", &cfg.Config{})
-	failOnErr("%v", err)
-	Cfg := ICfg.(*cfg.Config)
+	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
 	port := Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
 	route := Cfg.Route
@@ -95,7 +93,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 				fPln(rt, res)
 				return c.File(res)
 			}
-			fPf("%v\n", warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res))
+			_, err = warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
 			return err
 		}
 	}

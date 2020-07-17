@@ -51,11 +51,9 @@ func (cfg *Config) set() *Config {
 		// save
 		cfg.save()
 
-		ICfg, e := cfgRepl(cfg, map[string]interface{}{
+		return cfgRepl(cfg, map[string]interface{}{
 			"[DATE]": time.Now().Format("2006-01-02"),
-		})
-		failOnErr("%v", e)
-		return ICfg.(*Config)
+		}).(*Config)
 	}
 	return nil
 }

@@ -5,37 +5,39 @@ import (
 	"strings"
 	"sync"
 
-	cmn "github.com/cdutwhu/n3-util/common"
+	"github.com/cdutwhu/debog/fn"
+	"github.com/cdutwhu/gotil/io"
+	"github.com/cdutwhu/gotil/judge"
+	"github.com/cdutwhu/gotil/net"
+	"github.com/cdutwhu/gotil/rflx"
+	"github.com/cdutwhu/n3-util/rest"
 )
 
 var (
-	fPf  = fmt.Printf
-	fPln = fmt.Println
-	fSf  = fmt.Sprintf
-	fEf  = fmt.Errorf
-
+	fPf         = fmt.Printf
+	fPln        = fmt.Println
+	fSf         = fmt.Sprintf
+	fEf         = fmt.Errorf
 	sReplaceAll = strings.ReplaceAll
 	sJoin       = strings.Join
 
-	localIP       = cmn.LocalIP
-	isXML         = cmn.IsXML
-	isJSON        = cmn.IsJSON
-	setLog        = cmn.SetLog
-	logger        = cmn.Log
-	warnOnErr     = cmn.WarnOnErr
-	failOnErr     = cmn.FailOnErr
-	failOnErrWhen = cmn.FailOnErrWhen
-	mustWriteFile = cmn.MustWriteFile
-	struct2Map    = cmn.Struct2Map
-	url1Value     = cmn.URL1Value
-	env2Struct    = cmn.Env2Struct
+	localIP       = net.LocalIP
+	isXML         = judge.IsXML
+	isJSON        = judge.IsJSON
+	setLog        = fn.SetLog
+	logger        = fn.Logger
+	warnOnErr     = fn.WarnOnErr
+	failOnErr     = fn.FailOnErr
+	failOnErrWhen = fn.FailOnErrWhen
+	mustWriteFile = io.MustWriteFile
+	struct2Map    = rflx.Struct2Map
+	env2Struct    = rflx.Env2Struct
+	url1Value     = rest.URL1Value
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
-	m, err := struct2Map(route)
-	failOnErr("%v", err)
-	for _, v := range m {
+	for _, v := range struct2Map(route) {
 		mMtx[v.(string)] = &sync.Mutex{}
 	}
 	return mMtx
