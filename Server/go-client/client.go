@@ -23,7 +23,9 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 		span := tracer.StartSpan(fn, opentracing.ChildOf(span.Context()))
 		tags.SpanKindRPCClient.Set(span)
 		tags.PeerService.Set(span, serviceName)
-		span.SetTag(fn, *args)
+		if args != nil {
+			span.SetTag(fn, *args)
+		}
 		defer span.Finish()
 		ctx = opentracing.ContextWithSpan(ctx, span)
 	}
