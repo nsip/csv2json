@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nats-io/nats.go"
 	cfg "github.com/nsip/n3-csv2json/Server/config"
+	"github.com/sirupsen/logrus"
 )
 
 func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
@@ -26,7 +27,11 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
-	defer func() { fPln(logger("HostHTTPAsync Exit")) }()
+	defer func() {
+		msg := "HostHTTPAsync Exit"
+		logger(msg)
+		lrOut(logrus.Infof, msg) // --> LOGGLY
+	}()
 
 	e := echo.New()
 	defer e.Close()
@@ -93,8 +98,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 				fPln(rt, res)
 				return c.File(res)
 			}
-			_, err = warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
-			return err
+			return warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
 		}
 	}
 

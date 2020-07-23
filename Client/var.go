@@ -24,8 +24,7 @@ var (
 	failOnErr     = fn.FailOnErr
 	warnOnErrWhen = fn.WarnOnErrWhen
 	warnOnErr     = fn.WarnOnErr
-	setLog        = fn.SetLog
-	resetLog      = fn.ResetLog
+	enableLog2F   = fn.EnableLog2F
 	isXML         = judge.IsXML
 	isJSON        = judge.IsJSON
 	env2Struct    = rflx.Env2Struct

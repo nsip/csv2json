@@ -10,6 +10,7 @@ import (
 	"github.com/cdutwhu/gotil/judge"
 	"github.com/cdutwhu/gotil/net"
 	"github.com/cdutwhu/gotil/rflx"
+	"github.com/cdutwhu/n3-util/n3log"
 	"github.com/cdutwhu/n3-util/rest"
 )
 
@@ -24,7 +25,7 @@ var (
 	localIP       = net.LocalIP
 	isXML         = judge.IsXML
 	isJSON        = judge.IsJSON
-	setLog        = fn.SetLog
+	enableLog2F   = fn.EnableLog2F
 	logger        = fn.Logger
 	warnOnErr     = fn.WarnOnErr
 	failOnErr     = fn.FailOnErr
@@ -33,6 +34,7 @@ var (
 	struct2Map    = rflx.Struct2Map
 	env2Struct    = rflx.Env2Struct
 	url1Value     = rest.URL1Value
+	lrOut         = n3log.LrOut
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {

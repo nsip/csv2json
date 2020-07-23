@@ -1,6 +1,5 @@
 Path = "/home/qmiao/Desktop/n3-csv2json/Server/go-client/config.toml"
-LogFile = "./go-clt-CSV2JSON-[DATE].log"
-ServiceName = "N3-CSV2JSON"
+Service = "n3-csv2json"
 
 [Server]
   Protocol = "http"
@@ -12,5 +11,5 @@ ServiceName = "N3-CSV2JSON"
 
 [Route]
   HELP = "/"
-  CSV2JSON = "/csv2json/v0.1.1"
-  JSON2CSV = "/json2csv/v0.1.1"
+  CSV2JSON = "/n3-csv2json/v0.2.1/csv2json"
+  JSON2CSV = "/n3-csv2json/v0.2.1/json2csv"

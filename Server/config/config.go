@@ -11,12 +11,15 @@ import (
 
 // Config is toml
 type Config struct {
-	Path        string
-	LogFile     string
-	ServiceName string
-	WebService  struct {
-		Port    int
-		Version string
+	Log     string
+	Path    string
+	Service string
+	Version string
+	Loggly  struct {
+		Token string
+	}
+	WebService struct {
+		Port int
 	}
 	Route struct {
 		HELP     string
@@ -64,14 +67,18 @@ func (cfg *Config) set() *Config {
 			cfg.Path = abs
 		}
 		if ver, e := gitver(); e == nil && ver != "" { /* successfully got git ver */
-			cfg.WebService.Version = ver
+			cfg.Version = ver
 		}
 		// save
 		cfg.save()
 
+		home, e := os.UserHomeDir()
+		failOnErr("%v", e)
 		return cfgRepl(cfg, map[string]interface{}{
+			"~":      home,
 			"[DATE]": time.Now().Format("2006-01-02"),
-			"[v]":    cfg.WebService.Version,
+			"[s]":    cfg.Service,
+			"[v]":    cfg.Version,
 		}).(*Config)
 	}
 	return nil

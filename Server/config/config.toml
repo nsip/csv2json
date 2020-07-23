@@ -1,15 +1,18 @@
+Log = "~/.[s]/log/[DATE].log"
 Path = "/home/qmiao/Desktop/n3-csv2json/Server/config/config.toml"
-LogFile = "./[DATE].log"
-ServiceName = "N3-CSV2JSON"
+Service = "n3-csv2json"
+Version = "v0.2.1"
+
+[Loggly]
+  Token = "54290728-93e0-425a-a49c-c9e834288026"
 
 [WebService]
   Port = 1325
-  Version = "v0.1.1"
 
 [Route]
   HELP = "/"
-  CSV2JSON = "/csv2json/[v]"
-  JSON2CSV = "/json2csv/[v]"
+  CSV2JSON = "/[s]/[v]/csv2json"
+  JSON2CSV = "/[s]/[v]/json2csv"
 
 [NATS]
   URL = "nats://192.168.78.130:4222"

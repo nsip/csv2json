@@ -26,7 +26,7 @@ var (
 	logWhen       = fn.LoggerWhen
 	warnOnErr     = fn.WarnOnErr
 	warnOnErrWhen = fn.WarnOnErrWhen
-	setLog        = fn.SetLog
+	enableLog2F   = fn.EnableLog2F
 	env2Struct    = rflx.Env2Struct
 	struct2Env    = rflx.Struct2Env
 	struct2Map    = rflx.Struct2Map
