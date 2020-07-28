@@ -1,4 +1,4 @@
-package client
+package goclient
 
 import (
 	"bytes"
@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"time"
 
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/opentracing/opentracing-go"
 	tags "github.com/opentracing/opentracing-go/ext"
 )
 
 // DOwithTrace :
 func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
+	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", n3err.CFG_INIT_ERR)
 	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 	service := Cfg.Service
 
@@ -34,7 +34,7 @@ func DOwithTrace(ctx context.Context, configfile, fn string, args *Args) (string
 
 // DO : fn ["HELP", "CSV2JSON", "JSON2CSV"]
 func DO(configfile, fn string, args *Args) (string, error) {
-	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", eg.CFG_INIT_ERR)
+	failOnErrWhen(!initEnvVarFromTOML(envVarName, configfile), "%v", n3err.CFG_INIT_ERR)
 
 	Cfg := env2Struct(envVarName, &Config{}).(*Config)
 	server := Cfg.Server
@@ -43,7 +43,7 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	mFnURL, fields := initMapFnURL(protocol, ip, port, &Cfg.Route)
 	url, ok := mFnURL[fn]
-	if err := warnOnErrWhen(!ok, "%v: Need %v", eg.PARAM_NOT_SUPPORTED, fields); err != nil {
+	if err := warnOnErrWhen(!ok, "%v: Need %v", n3err.PARAM_NOT_SUPPORTED, fields); err != nil {
 		return "", err
 	}
 
@@ -54,10 +54,10 @@ func DO(configfile, fn string, args *Args) (string, error) {
 
 	select {
 	case <-time.After(time.Duration(timeout) * time.Second):
-		return "", warnOnErr("%v: Didn't get response in %d(s)", eg.NET_TIMEOUT, timeout)
+		return "", warnOnErr("%v: Didn't get response in %d(s)", n3err.NET_TIMEOUT, timeout)
 	case str := <-chStr:
 		err := <-chErr
-		if err == eg.NO_ERROR {
+		if err == n3err.NO_ERROR {
 			return str, nil
 		}
 		return str, err
@@ -91,17 +91,17 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 
 	case "CSV2JSON", "JSON2CSV":
 		if args == nil {
-			Err = eg.PARAM_INVALID
+			Err = n3err.PARAM_INVALID
 			goto ERR_RET
 		}
 
 		data := args.Data
 		if data == nil {
-			Err = eg.HTTP_REQBODY_EMPTY
+			Err = n3err.HTTP_REQBODY_EMPTY
 			goto ERR_RET
 		}
 		if fn == "JSON2CSV" && !isJSON(string(data)) {
-			Err = eg.PARAM_INVALID_JSON
+			Err = n3err.PARAM_INVALID_JSON
 			goto ERR_RET
 		}
 		if Resp, Err = http.Post(url, "application/json", bytes.NewBuffer(data)); Err != nil {
@@ -110,7 +110,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 	}
 
 	if Resp == nil {
-		Err = eg.NET_NO_RESPONSE
+		Err = n3err.NET_NO_RESPONSE
 		goto ERR_RET
 	}
 	defer Resp.Body.Close()
@@ -127,6 +127,6 @@ ERR_RET:
 	}
 
 	chStr <- string(RetData)
-	chErr <- eg.NO_ERROR
+	chErr <- n3err.NO_ERROR
 	return
 }

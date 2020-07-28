@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cdutwhu/n3-util/n3csv"
-	eg "github.com/cdutwhu/n3-util/n3errs"
+	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -59,7 +59,6 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	port := Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
 	route := Cfg.Route
-	file := Cfg.File
 	mMtx := initMutex(&route)
 
 	defer e.Start(fSf(":%d", port))
@@ -72,39 +71,39 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		mMtx[path].Lock()
 
 		return c.String(http.StatusOK,
-			fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
-				fSf("wget %-55s-> %s\n", fullIP+"/client-win64", "Get Client(Windows64)")+
-				fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/client-config", "Get Client Config")+
-				fSf("\n")+
-				fSf("POST %-55s-> %s\n"+
-					"POST %-55s-> %s\n",
-					fullIP+route.CSV2JSON, "Upload CSV, return JSON.",
-					fullIP+route.JSON2CSV, "Upload JSON, return CSV."))
+			// fSf("wget %-55s-> %s\n", fullIP+"/client-linux64", "Get Client(Linux64)")+
+			// 	fSf("wget %-55s-> %s\n", fullIP+"/client-mac", "Get Client(Mac)")+
+			// 	fSf("wget %-55s-> %s\n", fullIP+"/client-win64", "Get Client(Windows64)")+
+			// 	fSf("wget -O config.toml %-40s-> %s\n", fullIP+"/client-config", "Get Client Config")+
+			// 	fSf("\n")+
+			fSf("POST %-55s-> %s\n"+
+				"POST %-55s-> %s\n",
+				fullIP+route.CSV2JSON, "Upload CSV, return JSON.",
+				fullIP+route.JSON2CSV, "Upload JSON, return CSV."))
 	})
 
 	// ------------------------------------------------------------------------------------ //
 
-	mRouteRes := map[string]string{
-		"/client-linux64": file.ClientLinux64,
-		"/client-mac":     file.ClientMac,
-		"/client-win64":   file.ClientWin64,
-		"/client-config":  file.ClientConfig,
-	}
+	// mRouteRes := map[string]string{
+	// 	"/client-linux64": Cfg.File.ClientLinux64,
+	// 	"/client-mac":     Cfg.File.ClientMac,
+	// 	"/client-win64":   Cfg.File.ClientWin64,
+	// 	"/client-config":  Cfg.File.ClientConfig,
+	// }
 
-	routeFun := func(rt, res string) func(c echo.Context) error {
-		return func(c echo.Context) (err error) {
-			if _, err = os.Stat(res); err == nil {
-				fPln(rt, res)
-				return c.File(res)
-			}
-			return warnOnErr("%v: [%s]  get [%s]", eg.FILE_NOT_FOUND, rt, res)
-		}
-	}
+	// routeFun := func(rt, res string) func(c echo.Context) error {
+	// 	return func(c echo.Context) (err error) {
+	// 		if _, err = os.Stat(res); err == nil {
+	// 			fPln(rt, res)
+	// 			return c.File(res)
+	// 		}
+	// 		return warnOnErr("%v: [%s]  get [%s]", n3err.FILE_NOT_FOUND, rt, res)
+	// 	}
+	// }
 
-	for rt, res := range mRouteRes {
-		e.GET(rt, routeFun(rt, res))
-	}
+	// for rt, res := range mRouteRes {
+	// 	e.GET(rt, routeFun(rt, res))
+	// }
 
 	// ------------------------------------------------------------------------------------ //
 
@@ -175,7 +174,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		defer func() { mMtx[path].Unlock() }()
 		mMtx[path].Lock()
 
-		RetErr := eg.NOT_IMPLEMENTED
+		RetErr := n3err.NOT_IMPLEMENTED
 
 		RetErrStr := ""
 		if RetErr != nil {

@@ -1,7 +1,7 @@
-Log = "~/.[s]/log/[DATE].log"
 Path = "/home/qmiao/Desktop/n3-csv2json/Server/config/config.toml"
 Service = "n3-csv2json"
-Version = "v0.2.1"
+Log = "~/.[s]/log/[DATE].log"
+Version = "v0.2.2"
 
 [Loggly]
   Token = "54290728-93e0-425a-a49c-c9e834288026"
@@ -9,18 +9,20 @@ Version = "v0.2.1"
 [WebService]
   Port = 1325
 
-[Route]
-  HELP = "/"
-  CSV2JSON = "/[s]/[v]/csv2json"
-  JSON2CSV = "/[s]/[v]/json2csv"
-
 [NATS]
   URL = "nats://192.168.78.130:4222"
   Subject = "CSV2JSON"
   Timeout = 500
 
-[File]
-  ClientLinux64 = "../../../Client/build/linux64/client"
-  ClientMac = "../../../Client/build/mac/client"
-  ClientWin64 = "../../../Client/build/win64/client.exe"
-  ClientConfig = "../../../Client/build/linux64/cfg-clt-csv2json.toml"
+[Route]
+  HELP = "/"
+  CSV2JSON = "/[s]/[v]/csv2json"
+  JSON2CSV = "/[s]/[v]/json2csv"
+
+[Server]
+  IP = "[IP]"
+  Port = 1325
+  Protocol = "http"
+
+[Access]
+  Timeout = 3
