@@ -34,7 +34,8 @@ var (
 	struct2Map    = rflx.Struct2Map
 	env2Struct    = rflx.Env2Struct
 	url1Value     = rest.URL1Value
-	lrOut         = n3log.LrOut
+	logBind       = n3log.Bind
+	loggly        = n3log.Loggly
 )
 
 func initMutex(route interface{}) map[string]*sync.Mutex {

@@ -13,7 +13,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nats-io/nats.go"
 	cfg "github.com/nsip/n3-csv2json/Server/config"
-	"github.com/sirupsen/logrus"
 )
 
 func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
@@ -27,11 +26,7 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
-	defer func() {
-		msg := "HostHTTPAsync Exit"
-		logger(msg)
-		lrOut(logrus.Infof, msg) // --> LOGGLY
-	}()
+	defer func() { logBind(logger, loggly("info")).Do("HostHTTPAsync Exit") }()
 
 	e := echo.New()
 	defer e.Close()
@@ -61,6 +56,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	route := Cfg.Route
 	mMtx := initMutex(&route)
 
+	logBind(logger, e.Logger.Infof, loggly("info")).Do("Echo Service is Working")
 	defer e.Start(fSf(":%d", port))
 
 	// *************************************** List all API, FILE *************************************** //
