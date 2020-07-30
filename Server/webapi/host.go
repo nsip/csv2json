@@ -56,7 +56,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	route := Cfg.Route
 	mMtx := initMutex(&route)
 
-	logBind(logger, e.Logger.Infof, loggly("info")).Do("Echo Service is Working")
+	logBind(logger, e.Logger.Infof, loggly("info")).Do("Echo Service is Starting")
 	defer e.Start(fSf(":%d", port))
 
 	// *************************************** List all API, FILE *************************************** //

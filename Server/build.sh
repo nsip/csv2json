@@ -6,7 +6,7 @@ rm -rf ./build/
 
 PROJECTPATH="github.com/nsip/n3-csv2json/Server"
 go test -v -timeout 2s $PROJECTPATH/preprocess -run TestGenSvrCfgStruct
-go test -v -timeout 2s $PROJECTPATH/config -run TestGenCltCfg -args "Version" "Log" "WebService" "NATS" "Loggly"
+go test -v -timeout 2s $PROJECTPATH/config -run TestGenCltCfg -args "Path" "Service" "Route" "Server" "Access"
 go test -v -timeout 2s $PROJECTPATH/preprocess -run TestGenCltCfgStruct
 
 go get

@@ -10,18 +10,16 @@ import (
 )
 
 var (
-	fPln           = fmt.Println
-	fSf            = fmt.Sprintf
-	failOnErr      = fn.FailOnErr
-	failOnErrWhen  = fn.FailOnErrWhen
-	enableLog2F    = fn.EnableLog2F
-	logWhen        = fn.LoggerWhen
-	logger         = fn.Logger
-	env2Struct     = rflx.Env2Struct
-	localIP        = net.LocalIP
-	lrInit         = n3log.LrInit
-	enableLoggly   = n3log.EnableLoggly
-	setLogglyToken = n3log.SetLogglyToken
-	logBind        = n3log.Bind
-	loggly         = n3log.Loggly
+	fPln          = fmt.Println
+	fSf           = fmt.Sprintf
+	failOnErr     = fn.FailOnErr
+	failOnErrWhen = fn.FailOnErrWhen
+	enableLog2F   = fn.EnableLog2F
+	logWhen       = fn.LoggerWhen
+	logger        = fn.Logger
+	env2Struct    = rflx.Env2Struct
+	localIP       = net.LocalIP
+	setLoggly     = n3log.SetLoggly
+	logBind       = n3log.Bind
+	loggly        = n3log.Loggly
 )

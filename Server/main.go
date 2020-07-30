@@ -15,10 +15,8 @@ func main() {
 	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
 	ws, logfile, service := Cfg.WebService, Cfg.Log, Cfg.Service
 
-	// --- LOGGLY ---
-	enableLoggly(true)
-	setLogglyToken(Cfg.Loggly.Token)
-	lrInit()
+	// --- LOGGLY --- //
+	setLoggly(true, Cfg.Loggly.Token, service)
 
 	enableLog2F(true, logfile)
 	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version)
@@ -32,6 +30,5 @@ func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Kill, os.Interrupt)
 	go api.HostHTTPAsync(c, done)
-	msg = <-done
-	logBind(logger, loggly("info")).Do(msg)
+	logBind(logger, loggly("info")).Do(<-done)
 }
