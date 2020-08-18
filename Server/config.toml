@@ -1,7 +1,7 @@
 Path = "/home/qmiao/Desktop/n3-csv2json/Server/config/config.toml"
-Service = "n3-csv2json"
-Log = "~/.[s]/log/[DATE].log"
-Version = "v0.2.4"
+Service = "[PRJ]"
+Log = "~/.[PRJ]/log/[DATE].log"
+Version = "[VER]"
 
 [Loggly]
   Token = "54290728-93e0-425a-a49c-c9e834288026"
@@ -16,8 +16,8 @@ Version = "v0.2.4"
 
 [Route]
   HELP = "/"
-  CSV2JSON = "/[s]/[v]/csv2json"
-  JSON2CSV = "/[s]/[v]/json2csv"
+  CSV2JSON = "/[PRJ]/[VER]/csv2json"
+  JSON2CSV = "/[PRJ]/[VER]/json2csv"
 
 [Server]
   IP = "[IP]"

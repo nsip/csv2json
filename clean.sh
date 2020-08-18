@@ -1,7 +1,6 @@
 #!/bin/bash
 
 cd ./Server && ./clean.sh && cd -
-cd ./Client && ./clean.sh && cd -
 
 rm -f *.log
 

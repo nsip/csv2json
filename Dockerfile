@@ -1,11 +1,14 @@
 FROM alpine
-RUN mkdir n3-csv2json
-COPY ./n3-csv2json /n3-csv2json
-WORKDIR /n3-csv2json/Server/build/linux64
+RUN mkdir /n3-csv2json
+COPY . / /n3-csv2json/
+WORKDIR /n3-csv2json/
 CMD [ "./server" ]
 
 ### docker build --tag=n3-csv2json .
 
-### docker tag IMAGE_ID cdutwhu/n3-csv2json:latest
+### ! run this docker image
+### docker run --name csv2json --net host n3-csv2json:latest
+
+### docker tag IMAGE_ID dockerhub-user/n3-csv2json:latest
 ### docker login
-### docker push cdutwhu/n3-csv2json
+### docker push dockerhub-user/n3-csv2json

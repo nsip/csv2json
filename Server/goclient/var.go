@@ -7,20 +7,18 @@ import (
 	"github.com/cdutwhu/debog/fn"
 	"github.com/cdutwhu/gotil/judge"
 	"github.com/cdutwhu/gotil/rflx"
-	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go/config"
 )
 
 var (
-	fPt        = fmt.Print
-	fPf        = fmt.Printf
-	fPln       = fmt.Println
-	fSf        = fmt.Sprintf
-	sJoin      = strings.Join
-	sReplace   = strings.Replace
-	sTrimRight = strings.TrimRight
-
+	fPt           = fmt.Print
+	fPf           = fmt.Printf
+	fPln          = fmt.Println
+	fSf           = fmt.Sprintf
+	sJoin         = strings.Join
+	sReplace      = strings.Replace
+	sTrimRight    = strings.TrimRight
 	failOnErrWhen = fn.FailOnErrWhen
 	failOnErr     = fn.FailOnErr
 	logWhen       = fn.LoggerWhen
@@ -33,11 +31,10 @@ var (
 	mapKeys       = rflx.MapKeys
 	isXML         = judge.IsXML
 	isJSON        = judge.IsJSON
-	cfgRepl       = n3cfg.Modify
 )
 
 const (
-	envVarName = "CfgClt-C2J"
+	envKey = "C2JGoClt"
 )
 
 // Args is arguments for "Route"

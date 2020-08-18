@@ -1,18 +1,18 @@
-package webapi
+package main
 
 import (
 	"context"
 	"net/http"
 	"os"
+	"reflect"
 	"time"
 
+	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/cdutwhu/n3-util/n3csv"
-	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nats-io/nats.go"
-	cfg "github.com/nsip/n3-csv2json/Server/config"
 )
 
 func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
@@ -34,15 +34,14 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	// waiting for shutdown
 	go shutdownAsync(e, sig, done)
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.BodyLimit("2G"))
-
 	// Add Jaeger Tracer into Middleware
 	c := jaegertracing.New(e, nil)
 	defer c.Close()
 
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.BodyLimit("2G"))
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"*"},
@@ -50,7 +49,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		AllowCredentials: true,
 	}))
 
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
+	Cfg := n3cfg.FromEnvN3csv2jsonServer(envKey)
 	port := Cfg.WebService.Port
 	fullIP := localIP() + fSf(":%d", port)
 	route := Cfg.Route
@@ -101,7 +100,8 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 	// 	e.GET(rt, routeFun(rt, res))
 	// }
 
-	// ------------------------------------------------------------------------------------ //
+	// ------------------------------------------------------------------------------------------------------------- //
+	// ------------------------------------------------------------------------------------------------------------- //
 
 	path = route.CSV2JSON
 	e.POST(path, func(c echo.Context) error {
@@ -109,77 +109,74 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		mMtx[path].Lock()
 
 		var (
-			RetStat = http.StatusOK
-			RetStr  string
-			RetInfo = "[n3csv.Reader2JSON]"
-			RetErr  error
+			status  = http.StatusOK
+			ret     string
+			results []reflect.Value
 		)
 
-		var (
-			ToNATS bool
-		)
-
-		if ok, n := url1Value(c.QueryParams(), 0, "nats"); ok && n == "true" {
-			ToNATS = true
+		logBind(logger, loggly("info")).Do("Parsing Params")
+		pvalues, msg := c.QueryParams(), false
+		if ok, n := url1Value(pvalues, 0, "nats"); ok && n != "" && n != "false" {
+			msg = true
 		}
 
-		// jsonstr, headers := n3csv.Reader2JSON(c.Request().Body, "")
-
+		logBind(logger, loggly("info")).Do("n3csv.Reader2JSON")
+		// jsonstr, headers, err := n3csv.Reader2JSON(bytes.NewReader(body), "")
 		// Trace [n3csv.Reader2JSON]
-		results := jaegertracing.TraceFunction(c, n3csv.Reader2JSON, c.Request().Body, "")
-		RetStr = results[0].Interface().(string)
-		// headers := results[1].Interface().([]string)
+		results = jaegertracing.TraceFunction(c, n3csv.Reader2JSON, c.Request().Body, "")
+		ret = results[0].Interface().(string)
+		if !results[2].IsNil() {
+			status = http.StatusInternalServerError
+			ret = results[2].Interface().(error).Error()
+			goto RET
+		}
+		logBind(logger, loggly("info")).Do("CSV Headers: " + sJoin(results[1].Interface().([]string), " "))
 
-		// send a copy to NATS
-		if ToNATS {
-			url := Cfg.NATS.URL
-			subj := Cfg.NATS.Subject
-			timeout := time.Duration(Cfg.NATS.Timeout)
-
-			RetInfo += fSf(" | To NATS@Subject: [%s@%s]", url, subj)
+		// Send a copy to NATS
+		if msg {
+			url, subj, timeout := Cfg.NATS.URL, Cfg.NATS.Subject, time.Duration(Cfg.NATS.Timeout)
 			nc, err := nats.Connect(url)
 			if err != nil {
-				RetStat, RetErr = http.StatusRequestTimeout, err
+				status = http.StatusInternalServerError
+				ret = err.Error() + fSf(" @NATS Connect @Subject: [%s@%s]", url, subj)
 				goto RET
 			}
-
-			msg, err := nc.Request(subj, []byte(RetStr), timeout*time.Millisecond)
-			if msg != nil {
-				RetInfo += fSf(" | NATS responded: [%s]", string(msg.Data))
-			}
+			msg, err := nc.Request(subj, []byte(ret), timeout*time.Millisecond)
 			if err != nil {
-				RetStat, RetErr = http.StatusInternalServerError, err
+				status = http.StatusInternalServerError
+				ret = err.Error() + fSf(" @NATS Request @Subject: [%s@%s]", url, subj)
 				goto RET
 			}
+			logBind(logger, loggly("info")).Do(string(msg.Data))
 		}
 
 	RET:
-		RetErrStr := ""
-		if RetErr != nil {
-			RetErrStr = RetErr.Error()
+		if status != http.StatusOK {
+			logBind(warner, loggly("warn")).Do(ret + " --> Failed")
+		} else {
+			logBind(logger, loggly("info")).Do("--> Finish CSV2JSON")
 		}
-		return c.JSON(RetStat, result{
-			Data:  RetStr,
-			Info:  RetInfo,
-			Error: RetErrStr,
-		})
+		return c.String(status, ret) // ret is already JSON String, so return String
 	})
 
-	path = route.JSON2CSV
-	e.POST(path, func(c echo.Context) error {
-		defer func() { mMtx[path].Unlock() }()
-		mMtx[path].Lock()
+	// ------------------------------------------------------------------------------------------------------------- //
+	// ------------------------------------------------------------------------------------------------------------- //
 
-		RetErr := n3err.NOT_IMPLEMENTED
+	// path = route.JSON2CSV
+	// e.POST(path, func(c echo.Context) error {
+	// 	defer func() { mMtx[path].Unlock() }()
+	// 	mMtx[path].Lock()
 
-		RetErrStr := ""
-		if RetErr != nil {
-			RetErrStr = RetErr.Error()
-		}
-		return c.JSON(http.StatusInternalServerError, result{
-			Data:  "",
-			Info:  "Not implemented",
-			Error: RetErrStr,
-		})
-	})
+	// 	RetErr := n3err.NOT_IMPLEMENTED
+
+	// 	RetErrStr := ""
+	// 	if RetErr != nil {
+	// 		RetErrStr = RetErr.Error()
+	// 	}
+	// 	return c.JSON(http.StatusInternalServerError, result{
+	// 		Data:  "",
+	// 		Info:  "Not implemented",
+	// 		Error: RetErrStr,
+	// 	})
+	// })
 }

@@ -4,31 +4,34 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/cdutwhu/n3-util/n3err"
-	cfg "github.com/nsip/n3-csv2json/Server/config"
-	api "github.com/nsip/n3-csv2json/Server/webapi"
 )
 
 func main() {
-	failOnErrWhen(!cfg.InitEnvVarFromTOML("Cfg"), "%v: Config Init Error", n3err.CFG_INIT_ERR)
+	Cfg := n3cfg.ToEnvN3csv2jsonServer(map[string]string{
+		"[s]": "Service",
+		"[v]": "Version",
+	}, envKey)
+	failOnErrWhen(Cfg == nil, "%v: Config Init Error", n3err.CFG_INIT_ERR)
 
-	Cfg := env2Struct("Cfg", &cfg.Config{}).(*cfg.Config)
-	ws, logfile, service := Cfg.WebService, Cfg.Log, Cfg.Service
-
-	// --- LOGGLY --- //
-	setLoggly(true, Cfg.Loggly.Token, service)
-
-	enableLog2F(true, logfile)
-	msg := fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version)
-	logBind(logger, loggly("info")).Do(msg)
-
+	ws, logfile, service := Cfg.WebService, Cfg.Log, Cfg.Service.(string)
 	os.Setenv("JAEGER_SERVICE_NAME", service)
 	os.Setenv("JAEGER_SAMPLER_TYPE", "const")
 	os.Setenv("JAEGER_SAMPLER_PARAM", "1")
 
+	// --- LOGGLY --- //
+	setLoggly(true, Cfg.Loggly.Token, service)
+
+	logBind(logger, loggly("info")).Do(fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version))
+
+	enableLog2F(true, logfile)
+	logBind(logger, loggly("info")).Do(fSf("local log file @ [%s]", Cfg.Log))
+
 	done := make(chan string)
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Kill, os.Interrupt)
-	go api.HostHTTPAsync(c, done)
+	go HostHTTPAsync(c, done)
+
 	logBind(logger, loggly("info")).Do(<-done)
 }
