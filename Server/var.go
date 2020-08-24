@@ -52,6 +52,11 @@ const (
 	envKey = "C2JSvr"
 )
 
+var (
+	logGrp  = logBind(logger) // logBind(logger, loggly("info"))
+	warnGrp = logBind(warner) // logBind(warner, loggly("warn"))
+)
+
 func initMutex(route interface{}) map[string]*sync.Mutex {
 	mMtx := make(map[string]*sync.Mutex)
 	for _, v := range struct2Map(route) {
@@ -59,9 +64,3 @@ func initMutex(route interface{}) map[string]*sync.Mutex {
 	}
 	return mMtx
 }
-
-// type result struct {
-// 	Data  string `json:"data"`
-// 	Info  string `json:"info"`
-// 	Error string `json:"error"`
-// }

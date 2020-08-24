@@ -26,7 +26,7 @@ func shutdownAsync(e *echo.Echo, sig <-chan os.Signal, done chan<- string) {
 
 // HostHTTPAsync : Host a HTTP Server for CSV or JSON
 func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
-	defer func() { logBind(logger, loggly("info")).Do("HostHTTPAsync Exit") }()
+	defer func() { logGrp.Do("HostHTTPAsync Exit") }()
 
 	e := echo.New()
 	defer e.Close()
@@ -49,13 +49,15 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 		AllowCredentials: true,
 	}))
 
-	Cfg := n3cfg.FromEnvN3csv2jsonServer(envKey)
-	port := Cfg.WebService.Port
-	fullIP := localIP() + fSf(":%d", port)
-	route := Cfg.Route
-	mMtx := initMutex(&route)
+	var (
+		Cfg    = n3cfg.FromEnvN3csv2jsonServer(envKey)
+		port   = Cfg.WebService.Port
+		fullIP = localIP() + fSf(":%d", port)
+		route  = Cfg.Route
+		mMtx   = initMutex(&route)
+	)
 
-	logBind(logger, e.Logger.Infof, loggly("info")).Do("Echo Service is Starting")
+	logGrp.Do("Echo Service is Starting")
 	defer e.Start(fSf(":%d", port))
 
 	// *************************************** List all API, FILE *************************************** //
@@ -112,15 +114,15 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 			status  = http.StatusOK
 			ret     string
 			results []reflect.Value
+			msg     bool
 		)
 
-		logBind(logger, loggly("info")).Do("Parsing Params")
-		pvalues, msg := c.QueryParams(), false
-		if ok, n := url1Value(pvalues, 0, "nats"); ok && n != "" && n != "false" {
+		logGrp.Do("Parsing Params")
+		if ok, n := url1Value(c.QueryParams(), 0, "nats"); ok && n != "" && n != "false" {
 			msg = true
 		}
 
-		logBind(logger, loggly("info")).Do("n3csv.Reader2JSON")
+		logGrp.Do("n3csv.Reader2JSON")
 		// jsonstr, headers, err := n3csv.Reader2JSON(bytes.NewReader(body), "")
 		// Trace [n3csv.Reader2JSON]
 		results = jaegertracing.TraceFunction(c, n3csv.Reader2JSON, c.Request().Body, "")
@@ -130,7 +132,7 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 			ret = results[2].Interface().(error).Error()
 			goto RET
 		}
-		logBind(logger, loggly("info")).Do("CSV Headers: " + sJoin(results[1].Interface().([]string), " "))
+		logGrp.Do("CSV Headers: " + sJoin(results[1].Interface().([]string), " "))
 
 		// Send a copy to NATS
 		if msg {
@@ -147,14 +149,14 @@ func HostHTTPAsync(sig <-chan os.Signal, done chan<- string) {
 				ret = err.Error() + fSf(" @NATS Request @Subject: [%s@%s]", url, subj)
 				goto RET
 			}
-			logBind(logger, loggly("info")).Do(string(msg.Data))
+			logGrp.Do(string(msg.Data))
 		}
 
 	RET:
 		if status != http.StatusOK {
-			logBind(warner, loggly("warn")).Do(ret + " --> Failed")
+			warnGrp.Do(ret + " --> Failed")
 		} else {
-			logBind(logger, loggly("info")).Do("--> Finish CSV2JSON")
+			logGrp.Do("--> Finish CSV2JSON")
 		}
 		return c.String(status, ret) // ret is already JSON String, so return String
 	})

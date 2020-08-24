@@ -23,15 +23,14 @@ func main() {
 	// --- LOGGLY --- //
 	setLoggly(true, Cfg.Loggly.Token, service)
 
-	logBind(logger, loggly("info")).Do(fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version))
-
 	enableLog2F(true, logfile)
-	logBind(logger, loggly("info")).Do(fSf("local log file @ [%s]", Cfg.Log))
+	logGrp.Do(fSf("local log file @ [%s]", logfile))
+	logGrp.Do(fSf("[%s] Hosting on: [%v:%d], version [%v]", service, localIP(), ws.Port, Cfg.Version))
 
 	done := make(chan string)
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Kill, os.Interrupt)
 	go HostHTTPAsync(c, done)
 
-	logBind(logger, loggly("info")).Do(<-done)
+	logGrp.Do(<-done)
 }
