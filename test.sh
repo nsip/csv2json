@@ -10,9 +10,9 @@ W=`tput sgr0`
 printf "\n"
 
 ip="192.168.31.168:1325/"
-base=$ip"n3-csv2json/v0.3.0/"
+base=$ip"n3-csv2json/v0.3.1/"
 
-# all api
+
 title="CSV2JSON all API Paths"
 url=$ip
 scode=`curl --write-out "%{http_code}" --silent --output /dev/null $url`
@@ -24,7 +24,7 @@ fi
 curl -i $url
 printf "\n"
 
-# CSV to JSON
+
 title="CSV to JSON Test"
 url=$base"csv2json"
 file='@./data/Modules.csv'

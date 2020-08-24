@@ -22,6 +22,7 @@ func main() {
 
 	// --- LOGGLY --- //
 	setLoggly(true, Cfg.Loggly.Token, service)
+	syncBindLog(true)
 
 	enableLog2F(true, logfile)
 	logGrp.Do(fSf("local log file @ [%s]", logfile))
@@ -31,6 +32,5 @@ func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Kill, os.Interrupt)
 	go HostHTTPAsync(c, done)
-
 	logGrp.Do(<-done)
 }

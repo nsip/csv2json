@@ -43,6 +43,7 @@ var (
 	mustWriteFile = io.MustWriteFile
 	url1Value     = rest.URL1Value
 	setLoggly     = n3log.SetLoggly
+	syncBindLog   = n3log.SyncBindLog
 	logBind       = n3log.Bind
 	loggly        = n3log.Loggly
 	cfgRepl       = n3cfg.Modify

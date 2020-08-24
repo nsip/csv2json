@@ -24,4 +24,4 @@ mkdir -p $dir
 
 cp ./Server/build/$os/* ./Dockerfile $dir
 
-echo "${G}Server Package $os Version is Dumped into $dir ${W}"
+echo "Server Package $os Version is Dumped into $dir"

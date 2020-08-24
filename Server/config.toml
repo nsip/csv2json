@@ -1,4 +1,4 @@
-Path = "/home/qmiao/Desktop/n3-csv2json/Server/config/config.toml"
+Path = "[PATH]"
 Service = "[PRJ]"
 Log = "~/.[PRJ]/log/[DATE].log"
 Version = "[VER]"
