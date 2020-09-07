@@ -38,7 +38,8 @@ RUN mkdir -p /build
 WORKDIR /build
 COPY . .
 WORKDIR Server
-RUN go build -o /build/app
+RUN go get github.com/cdutwhu/n3-util/n3cfg
+RUN CGO_ENABLED=0 go build -o /build/app
 
 ############################
 # STEP 2 build a small image
