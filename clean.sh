@@ -1,6 +1,7 @@
 #!/bin/bash
 
-cd ./Server && ./clean.sh && cd -
+oripath=`pwd`
+cd ./Server && ./clean.sh && cd $oripath
 
 rm -f *.log
 

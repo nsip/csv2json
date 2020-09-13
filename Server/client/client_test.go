@@ -10,7 +10,7 @@ func TestDO(t *testing.T) {
 	failOnErr("%v: ", err)
 	str, err := DO(
 		"./config.toml",
-		"CSV2JSON",
+		"ToJSON",
 		&Args{
 			Data:   data,
 			ToNATS: false,

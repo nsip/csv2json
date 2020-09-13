@@ -10,7 +10,7 @@ W=`tput sgr0`
 printf "\n"
 
 ip="192.168.31.168:1325/"
-base=$ip"n3-csv2json/v0.3.1/"
+base=$ip"n3-csv2json/v0.3.0/"
 
 
 title="CSV2JSON all API Paths"
@@ -26,7 +26,7 @@ printf "\n"
 
 
 title="CSV to JSON Test"
-url=$base"csv2json"
+url=$base"2json"
 file='@./data/Modules.csv'
 scode=`curl -X POST $url --data-binary $file -w "%{http_code}" -s -o /dev/null`
 if [ $scode -ne 200 ]; then

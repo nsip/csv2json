@@ -1,0 +1,14 @@
+Service = "n3-csv2json"
+
+[Route]
+  Help = "/"
+  ToCSV = "/n3-csv2json/v0.3.0/2csv"
+  ToJSON = "/n3-csv2json/v0.3.0/2json"
+
+[Server]
+  IP = "192.168.31.168"
+  Port = 1325
+  Protocol = "http"
+
+[Access]
+  Timeout = 3

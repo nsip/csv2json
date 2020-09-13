@@ -21,7 +21,5 @@ if [ $os != 'linux64' ] && [ $os != 'mac' ] && [ $os != 'win64' ]; then
 fi
 
 mkdir -p $dir
-
-cp ./Server/build/$os/* ./Dockerfile $dir
-
+cp ./Server/build/$os/* $dir
 echo "Server Package $os Version is Dumped into $dir"

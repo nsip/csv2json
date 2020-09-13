@@ -2,15 +2,9 @@
 
 ## Getting Started
 
-0. Make sure golang dev package is available in your machine.
-
-1. Run `go get -u ./...` to update this project's dependencies.
-
-   Ignore any `undefined: n3cfg.***` errors.
+1. Make sure `GOLANG` dev package & `GIT` are available in your machine.
 
 2. Build.
-
-   In 'build.sh', change 'password' in line "sudopwd='password'" to your real sudo/admin password & save.
 
    Run `build.sh`.
 

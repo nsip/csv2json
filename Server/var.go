@@ -16,37 +16,38 @@ import (
 )
 
 var (
-	fPt           = fmt.Print
-	fPf           = fmt.Printf
-	fEf           = fmt.Errorf
-	fPln          = fmt.Println
-	fSf           = fmt.Sprintf
-	sReplaceAll   = strings.ReplaceAll
-	sJoin         = strings.Join
-	sReplace      = strings.Replace
-	sTrimRight    = strings.TrimRight
-	failOnErr     = fn.FailOnErr
-	failOnErrWhen = fn.FailOnErrWhen
-	enableLog2F   = fn.EnableLog2F
-	logWhen       = fn.LoggerWhen
-	logger        = fn.Logger
-	warner        = fn.Warner
-	warnOnErr     = fn.WarnOnErr
-	warnOnErrWhen = fn.WarnOnErrWhen
-	env2Struct    = rflx.Env2Struct
-	struct2Env    = rflx.Struct2Env
-	struct2Map    = rflx.Struct2Map
-	mapKeys       = rflx.MapKeys
-	localIP       = net.LocalIP
-	isXML         = judge.IsXML
-	isJSON        = judge.IsJSON
-	mustWriteFile = io.MustWriteFile
-	url1Value     = rest.URL1Value
-	setLoggly     = n3log.SetLoggly
-	syncBindLog   = n3log.SyncBindLog
-	logBind       = n3log.Bind
-	loggly        = n3log.Loggly
-	cfgRepl       = n3cfg.Modify
+	fPt              = fmt.Print
+	fPf              = fmt.Printf
+	fEf              = fmt.Errorf
+	fPln             = fmt.Println
+	fSf              = fmt.Sprintf
+	sReplaceAll      = strings.ReplaceAll
+	sJoin            = strings.Join
+	sReplace         = strings.Replace
+	sTrimRight       = strings.TrimRight
+	failOnErr        = fn.FailOnErr
+	failOnErrWhen    = fn.FailOnErrWhen
+	enableLog2F      = fn.EnableLog2F
+	enableWarnDetail = fn.EnableWarnDetail
+	logWhen          = fn.LoggerWhen
+	logger           = fn.Logger
+	warner           = fn.Warner
+	warnOnErr        = fn.WarnOnErr
+	warnOnErrWhen    = fn.WarnOnErrWhen
+	env2Struct       = rflx.Env2Struct
+	struct2Env       = rflx.Struct2Env
+	struct2Map       = rflx.Struct2Map
+	mapKeys          = rflx.MapKeys
+	localIP          = net.LocalIP
+	isXML            = judge.IsXML
+	isJSON           = judge.IsJSON
+	mustWriteFile    = io.MustWriteFile
+	url1Value        = rest.URL1Value
+	setLoggly        = n3log.SetLoggly
+	syncBindLog      = n3log.SyncBindLog
+	logBind          = n3log.Bind
+	loggly           = n3log.Loggly
+	cfgRepl          = n3cfg.Modify
 )
 
 const (

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cdutwhu/n3-util/n3cfg"
 	"github.com/cdutwhu/n3-util/n3err"
 	"github.com/opentracing/opentracing-go"
 	tags "github.com/opentracing/opentracing-go/ext"
@@ -16,8 +15,9 @@ import (
 // DOwithTrace :
 func DOwithTrace(ctx context.Context, config, fn string, args *Args) (string, error) {
 
-	Cfg := n3cfg.ToEnvN3csv2jsonGoclient(nil, envKey, config)
-	failOnErrWhen(Cfg == nil, "%v", n3err.CFG_INIT_ERR)
+	pCfg := NewCfg("Config", nil)
+	failOnErrWhen(pCfg == nil, "%v", n3err.CFG_INIT_ERR)
+	Cfg := pCfg.(*Config)
 
 	service := Cfg.Service
 	if span := opentracing.SpanFromContext(ctx); span != nil {
@@ -37,8 +37,9 @@ func DOwithTrace(ctx context.Context, config, fn string, args *Args) (string, er
 // DO : fn ["HELP", "CSV2JSON", "JSON2CSV"]
 func DO(config, fn string, args *Args) (string, error) {
 
-	Cfg := n3cfg.ToEnvN3csv2jsonGoclient(nil, envKey, config)
-	failOnErrWhen(Cfg == nil, "%v", n3err.CFG_INIT_ERR)
+	pCfg := NewCfg("Config", nil)
+	failOnErrWhen(pCfg == nil, "%v", n3err.CFG_INIT_ERR)
+	Cfg := pCfg.(*Config)
 
 	server := Cfg.Server
 	protocol, ip, port := server.Protocol, server.IP, server.Port
@@ -87,12 +88,12 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 	)
 
 	switch fn {
-	case "HELP":
+	case "Help":
 		if Resp, Err = http.Get(url); Err != nil {
 			goto ERR_RET
 		}
 
-	case "CSV2JSON", "JSON2CSV":
+	case "ToJSON", "ToCSV":
 		if args == nil {
 			Err = n3err.PARAM_INVALID
 			goto ERR_RET
@@ -103,7 +104,7 @@ func rest(fn, url string, args *Args, chStr chan string, chErr chan error) {
 			Err = n3err.HTTP_REQBODY_EMPTY
 			goto ERR_RET
 		}
-		if fn == "JSON2CSV" && !isJSON(string(data)) {
+		if fn == "ToCSV" && !isJSON(string(data)) {
 			Err = n3err.PARAM_INVALID_JSON
 			goto ERR_RET
 		}

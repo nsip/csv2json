@@ -30,23 +30,22 @@
 ############################
 # STEP 1 build executable binary (go.mod version)
 ############################
-FROM golang:1.15.0-alpine3.12 as builder
-RUN apk --no-cache add ca-certificates
-RUN apk update && apk add git
-RUN apk add gcc g++
-RUN mkdir -p /build
-WORKDIR /build
-COPY . .
-WORKDIR Server
-RUN CGO_ENABLED=0 go build -o /build/app
+FROM golang:1.15.2-alpine3.12 as builder
+RUN apk add --no-cache ca-certificates
+RUN apk update && apk add --no-cache git bash
+RUN mkdir -p /n3-csv2json
+COPY . / /n3-csv2json/
+WORKDIR /n3-csv2json/
+RUN ["/bin/bash", "-c", "./build_d.sh"]
+RUN ["/bin/bash", "-c", "./release_d.sh"] 
 
 ############################
 # STEP 2 build a small image
 ############################
 #FROM debian:stretch
 FROM alpine
-COPY --from=builder /build/app /app
+COPY --from=builder /n3-csv2json/app/ /
 # NOTE - make sure it is the last build that still copies the files
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /build/Server/config/config.toml /
-CMD ["./app"]
+WORKDIR /
+CMD ["./server"]
