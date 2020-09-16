@@ -1,4 +1,4 @@
-package goclient
+package client
 
 import "github.com/cdutwhu/n3-util/n3cfg"
 
@@ -11,9 +11,9 @@ type Config struct {
 		ToJSON string
 	}
 	Server struct {
+		Protocol string
 		IP string
 		Port int
-		Protocol string
 	}
 	Access struct {
 		Timeout int
