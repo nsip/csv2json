@@ -4,9 +4,9 @@ import "github.com/cdutwhu/n3-util/n3cfg"
 
 // Config : AUTO Created From /home/qmiao/Desktop/temp/n3-csv2json/Config/config.toml
 type Config struct {
-	Version interface{}
 	Log string
 	Service interface{}
+	Version string
 	Loggly struct {
 		Token string
 	}
@@ -14,9 +14,9 @@ type Config struct {
 		Port int
 	}
 	NATS struct {
+		URL string
 		Subject string
 		Timeout int
-		URL string
 	}
 	Route struct {
 		Help string
@@ -24,9 +24,9 @@ type Config struct {
 		ToJSON string
 	}
 	Server struct {
-		Protocol string
 		IP interface{}
 		Port int
+		Protocol string
 	}
 	Access struct {
 		Timeout int
